@@ -2,9 +2,16 @@ const express = require('express')
 const app = express()
 var morgan = require('morgan')
 
+morgan.token('postData', function (req, res) { 
+    if(req.method.toLowerCase() === "post"){
+        return JSON.stringify(req.body)
+    }
+    return ""
+})
+
 app.use(express.json())
 
-app.use(morgan('tiny'))
+app.use(morgan(':method :url :response-time :postData'))
 
 let persons = [
     {
@@ -93,6 +100,7 @@ app.post('/api/persons', (request, response) => {
 
 response.json(person)
 })
+
 
 const PORT = 3001
 app.listen(PORT, () => {
