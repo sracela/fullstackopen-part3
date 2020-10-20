@@ -46,10 +46,7 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const person = persons.find(person => {
-        // console.log(note.id, typeof note.id, id, typeof id, note.id === id)
-        return person.id === id
-    }) 
+    const person = persons.find(person =>  person.id === id) 
     if (person) {
       response.json(person)
     } else {
@@ -70,20 +67,26 @@ function getRandomId(max) {
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    // if (!body.content) {
-    //   return response.status(400).json({ 
-    //     error: 'content missing' 
-    //   })
-    // }
-    console.log(body)
+    if (!body.name || !body.number) {
+      return response.status(400).json({ 
+        error: 'content missing' 
+      })
+    }
+    const person = persons.find(person =>  person.name === body.name) 
+    if(person){
+        return response.status(400).json({ 
+          error: 'name must be unique' 
+        })
 
-    const person = {
+    }
+
+    const newPerson = {
         name: body.name,
         number: body.number,
         id: getRandomId(1000),
     }
 
-    persons = persons.concat(person)
+    persons = persons.concat(newPerson)
 
 response.json(person)
 })
