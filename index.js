@@ -7,6 +7,8 @@ app.use(cors())
 
 app.use(express.static('build'))
 
+app.use(express.json())
+
 morgan.token('postData', function (req, res) { 
     if(req.method.toLowerCase() === "post"){
         return JSON.stringify(req.body)
@@ -14,7 +16,6 @@ morgan.token('postData', function (req, res) {
     return ""
 })
 
-app.use(express.json())
 
 app.use(morgan(':method :url :response-time :postData'))
 
@@ -103,7 +104,7 @@ app.post('/api/persons', (request, response) => {
 
     persons = persons.concat(newPerson)
 
-response.json(person)
+  response.json(newPerson)
 })
 
 const PORT = process.env.PORT || 3001
