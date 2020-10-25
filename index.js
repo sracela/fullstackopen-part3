@@ -1,7 +1,10 @@
+require('dotenv').config()
+
 const express = require('express')
 const app = express()
 var morgan = require('morgan')
 const cors = require('cors')
+const Contact = require('./models/contact')
 
 app.use(cors())
 
@@ -55,19 +58,29 @@ app.get('/info', (request, response) => {
   })
   
 
+// app.get('/api/persons', (request, response) => {
+//   response.json(persons)
+// })
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Contact.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 
+// app.get('/api/persons/:id', (request, response) => {
+//     const id = Number(request.params.id)
+//     const person = persons.find(person =>  person.id === id) 
+//     if (person) {
+//       response.json(person)
+//     } else {
+//       response.status(404).end()
+//     }
+// })
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person =>  person.id === id) 
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(404).end()
-    }
+  Contact.findById(request.params.id).then(person => {
+    response.json(person)
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -76,38 +89,56 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
-function getRandomId(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-  }
-  
+
 app.post('/api/persons', (request, response) => {
-    const body = request.body
+  const body = request.body
 
-    if (!body.name || !body.number) {
-      return response.status(400).json({ 
-        error: 'content missing' 
-      })
-    }
-    const person = persons.find(person =>  person.name === body.name) 
-    if(person){
-        return response.status(400).json({ 
-          error: 'name must be unique' 
-        })
+  if (body.name === undefined || body.number === undefined) {
+    return response.status(400).json({ error: 'content missing' })
+  }
 
-    }
+  const person = new Contact({
+    name: body.name,
+    number: body.number,
+  })
 
-    const newPerson = {
-        name: body.name,
-        number: body.number,
-        id: getRandomId(1000),
-    }
-
-    persons = persons.concat(newPerson)
-
-  response.json(newPerson)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
-const PORT = process.env.PORT || 3001
+// function getRandomId(max) {
+//     return Math.floor(Math.random() * Math.floor(max));
+//   }
+  
+// app.post('/api/persons', (request, response) => {
+//     const body = request.body
+
+//     if (!body.name || !body.number) {
+//       return response.status(400).json({ 
+//         error: 'content missing' 
+//       })
+//     }
+//     const person = persons.find(person =>  person.name === body.name) 
+//     if(person){
+//         return response.status(400).json({ 
+//           error: 'name must be unique' 
+//         })
+
+//     }
+
+//     const newPerson = {
+//         name: body.name,
+//         number: body.number,
+//         id: getRandomId(1000),
+//     }
+
+//     persons = persons.concat(newPerson)
+
+//   response.json(newPerson)
+// })
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
