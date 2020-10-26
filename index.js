@@ -24,12 +24,16 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
 
-    const info = `
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()} people</p>`
-    response.send(info)
+    Contact.countDocuments({})
+    .then(docCount => {
+      const info = `
+      <p>Phonebook has info for ${docCount} people</p>
+      <p>${new Date()}</p>`
+      response.send(info)
+    })
+    .catch(error => next(error))
   })
   
 
