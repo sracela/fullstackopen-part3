@@ -123,7 +123,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number,
   }
 
-  Contact.findByIdAndUpdate(request.params.id, person, { new: true })
+  Contact.findByIdAndUpdate(request.params.id, person, { runValidators: true, new: true })
     .then(updatedPerson => {
       response.json(updatedPerson.toJSON())
     })
